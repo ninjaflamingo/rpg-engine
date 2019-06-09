@@ -1,0 +1,160 @@
+<html>
+<head>
+<style>
+#canvas {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+
+}
+</style>
+</head>
+<body>
+<canvas id="canvas" width="640" height="480"></canvas>
+<script src="src/definitions.js"></script>
+<script src="src/classes.js"></script>
+<script src="src/controls.js"></script>
+
+<script>
+
+  document.documentElement.style.overflow = 'hidden';
+  // internet explorer:
+  document.body.scroll = 'no';
+
+  const canvas = new Context("canvas");
+  const WIDTH = canvas.width;
+  const HEIGHT = canvas.height;
+
+  const ITEM_GRADES = ['common', 'rare', 'legendary'];
+
+  const BLOCK_WIDTH = 64;
+  const BLOCK_HEIGHT = 64;
+
+  const BASE_TILE       = new Image();
+  const ROTATING_TILE   = new Image();
+  const WATER_TILE      = new Image();
+  const GHASTLY_SPRITE  = new Image();
+
+  BASE_TILE.src       = 'img/tiles/base_tile2.png';
+  ROTATING_TILE.src   = 'img/tiles/rotating_tile.png';
+  WATER_TILE.src      = 'img/tiles/water_tile.png';
+  GHASTLY_SPRITE.src  = 'img/sprites/ghastly16x16.png';
+
+  var AnimationCounterIndex = 0;
+  var AnimationCounter = new Array();
+
+  GHASTLY_SPRITE.onload = function(){
+
+
+      var wood = new Sprite('img/tiles/base_tile2.png', false);
+      var water = new Sprite('img/tiles/water_tile.png');
+      var map = new Map(water, wood);
+
+      var player = new Sprite('img/sprites/ghastly16x16.png', false);
+      var playerX = 64;
+      var playerY = 64;
+
+      var lootsprite = new Spritesheet('img/sprites/coin-sprite-animation-sprite-sheet.png');
+      var loot = new Loot(lootsprite);
+
+      var gemsprite = new Spritesheet('img/sprites/gem.png');
+      var gem = new Loot(gemsprite);
+
+      var player2sprite = new Spritesheet('img/sprites/ghastly16x16.png');
+      var player2 = new Sprite(player2sprite, false);
+      var player2X = 80;
+      var player2Y = 80;
+
+      initAnimationCounters();
+
+      setInterval(function(){
+          //var globalAnimationCounterIndex = 0;
+          resetAnimationCounter();
+          map.draw();
+          loot.draw(20, 20,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 44, 80, 0.5);
+          gem.draw(60, 90, [0, 1, 2, 3, 4, 5, 6, 7], 16, 16, 4);
+          var player_is_moving = false;
+          var player_direction = 0;
+          var player_seq = 0;
+          if(KEYSTATE.pressing_left)
+          {
+              player_is_moving = true;
+              player_direction |= DIRECTION_W;
+              playerX -= 4;
+          }
+          if(KEYSTATE.pressing_up)
+          {
+              player_is_moving = true;
+              player_direction |= DIRECTION_N;
+              playerY -= 4;
+          }
+          if(KEYSTATE.pressing_right)
+          {
+              player_is_moving = true;
+              player_direction |= DIRECTION_E;
+              playerX += 4;
+          }
+          if(KEYSTATE.pressing_down)
+          {
+              player_is_moving = true;
+              player_direction |= DIRECTION_S;
+              playerY += 4;
+          }
+          if(KEYSTATE.pressing_a)
+          {
+              player_is_moving = true;
+              player_direction |= DIRECTION_W;
+              playerX -= 4;
+          }
+          if(KEYSTATE.pressing_w)
+          {
+              player_is_moving = true;
+              player_direction |= DIRECTION_N;
+              playerY -= 4;
+          }
+          if(KEYSTATE.pressing_d)
+          {
+              player_is_moving = true;
+              player_direction |= DIRECTION_E;
+              playerX += 4;
+          }
+          if(KEYSTATE.pressing_s)
+          {
+              player_is_moving = true;
+              player_direction |= DIRECTION_S;
+              playerY += 4;
+          }
+
+
+          if(player_is_moving)
+          {
+              if(player_direction & DIRECTION_W) player_seq = [33, 34, 35, 36];
+              if(player_direction & DIRECTION_E) player_seq = [1, 2, 3, 4];
+              if(player_direction & DIRECTION_N) player_seq = [49, 50, 51, 52];
+              if(player_direction & DIRECTION_S) player_seq = [17, 18, 19, 20];
+
+              if(player_direction & DIRECTION_N &&
+                 player_direction & DIRECTION_E) player_seq = [57, 58, 59, 60];
+              if(player_direction & DIRECTION_N &&
+                 player_direction & DIRECTION_W) player_seq = [41, 42, 43, 44];
+              if(player_direction & DIRECTION_S &&
+                 player_direction & DIRECTION_E) player_seq = [9, 10, 11, 12];
+              if(player_direction & DIRECTION_S  &&
+                 player_direction & DIRECTION_W) player_seq = [25, 26, 27, 28];
+
+                player.drawMultiAnimated(playerX, playerY, player_seq, 16);
+          }
+          else
+          {
+              player.drawMultiAnimated(playerX, playerY, 0, 16);
+          }
+
+          player2.drawMultiAnimated(player2X, player2Y, [17, 18, 19, 20], 16);
+
+
+
+    }, 1000/25);
+};
+</script>
+</body>
+</html>
